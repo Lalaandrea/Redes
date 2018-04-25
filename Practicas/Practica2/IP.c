@@ -40,8 +40,8 @@ void binprintf(int IP)											//==============PRINT AS BINARY================
     for(byte i = 0; i < Exp; i++)							//For the number of the exponent
     {
         Pow *= 2;											//Power
-        printf("Pow %d\n",Pow );
-        binprintf(Pow);
+       // printf("Pow %d\n",Pow );
+        //binprintf(Pow);
     }
     return Pow;
 }
