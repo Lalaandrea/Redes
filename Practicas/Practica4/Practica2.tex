@@ -342,6 +342,28 @@
         { \leavevmode\color{#1}\ignorespaces }                      %That's is!
 
     % =====  CODE EDITOR =============
+
+      \lstdefinestyle{CompilandoStyle} {                        %This is Code Style
+        backgroundcolor     = \color{white},                        %Background Color  
+        basicstyle          = \tiny\color{BlueGrey900MD},           %Style of text
+        commentstyle        = \color{Green300MD},                   %Comment style
+        stringstyle         = \color{Teal700MD},                    %String style
+        keywordstyle        = \color{Blue700MD},                    %keywords style
+        numberstyle         = \tiny\color{TealMD},                  %Size of a number
+        frame               = none,                                 %Adds a frame around the code
+        breakatwhitespace   = true,                                 %Style   
+        breaklines          = true,                                 %Style   
+        showstringspaces    = false,                                %Hate those spaces                  
+        breaklines          = true,                                 %Style                   
+        keepspaces          = true,                                 %Style                   
+        numbers             = left,                                 %Style                   
+        numbersep           = 11pt,                                 %Style 
+        xleftmargin         = \parindent,                           %Style 
+        tabsize             = 4,                                    %Style
+        inputencoding       = utf8/latin1                           %Allow me to use special chars
+    }
+ 
+\lstset{style = CompilandoStyle} %Use this style
  
 
     % =========================================
@@ -407,7 +429,7 @@
     {\fontsize{36}{50}                                              %Size of the book
         \selectfont \textbf{Práctica 1}}\\[0.5cm]       %Name of the book
     {\fontsize{36}{50}                                              %Size of the book
-        \selectfont \textbf{Calculadora de IP}}\\[0.5cm]                %Name of the book
+        \selectfont \textbf{Analizador de Trama LLC}}\\[0.5cm]                %Name of the book
     \textcolor{ColorSubtext}                                        %Color or the topic
         {\textsc{\LARGE Redes de Computadoras}}     %Name of the general theme
     
@@ -430,7 +452,7 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%   ABSTRACT    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     \begin{abstract}
-    \emph{In this report we will see some of the caracteristics of the IP and provide a program that will calculate the IP Class, Range of host, Network and Broadcast.}
+    \emph{In this report we will see an analysis of  LLC frames and a program to do it quickly.}
     \end{abstract}
     %\begin{figure}[H]
      %          \centering
@@ -484,77 +506,147 @@
 %==========         INTRODUCCION            ===========
 %======================================================
 
-\section{Indroducción}
+\section{Indroducción: Control de enlace lógico}
+El  protocolo  LLC  (control  lógico  de  enlace)  es  un 
+protocolo  de  capa  de  enlace  de  datos  derivado  de 
+HDLC, del cual hereda su campo de  control,  y  fue 
+estandarizado  por  la  IEEE  bajo  la  denominación 
+802.2.  Igual  que  en  HDLC  se  tienen  tramas  de 
+información, 
+supervisión 
+y 
+no 
+numeradas 
+distinguiéndose   entre   ellas   por   los   bits   menos 
+significativos de su campo de control. 
+
+Tenemos la siguiente cabecera:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{LLC}   
+\end{figure}
 \section{Problema}
-* What question(s) are you trying to answer? 
-* Include any preliminary observations or background information about the subject
-\section{Hypothesis:}
-* Write a possible solution for the problem.
-* Make sure this possible solution is a complete sentence.
-* Make sure the statement is testable, an if-then statement is recommended to illustrate what criteria will support your hypothesis (and what data would no support the hypothesis).
+Realizar este tipo de análisis en muy especifico y fácil de realizar, sin embargo tiende a los errores humanos. 
+
+Como vimos en la cabecera tenemos los boques de la información y sus respectivo significados con lo cual podemos leer de alguna manera lo que nos estan diciendo las tramas.
+\section{Hipotesis:}
+
+Una cabecera LLC puede ser leída de manera secuencial, por lo tanto es posible programar la lectura del las mismas.
 
 \section{Software}
 \begin{itemize}
-    \item Librería stdlib.h
+    \item Librería stdlib.h 
     \item Librería stdio.h
     \item Librería stdbool.h
+    \item Librería string.h
 \end{itemize}
 
 \section{Procedimiento}
 \begin{itemize}
-    \item Leemos la ip, buscamos darle formato con el mismo escaner de la entrada, checamos que cada uno de los cuatro valores esten entre 0 y 225.
-    \item Buscamos la manera más efiiente de guardar esta información que en este caso es un entero sin signo, colocamos la información y pasamos a procesarla.
-    \item  Checamos la clase, esto se puede hacer con los bits más significativos del cuarteto de bytes. Podemos darnos cuenta de que lo importante es ver que bits entan en 1 y cuales no, asi que podemos checarlos fácilmente.
-    Para la clase A, el primer bit debe de ser 0.
-    Para la clase B el segundo bit debe de ser 0, y así sucesivamente.
-    \item Despues de esto la marcara la podemos obtener por definición de cada clase y con ella realizamos un OR con la IP y la Mascara negada.
-    \item Realizamos el calculo de la Red con un and binario.
-    \item El rango se obtiene simplemente sumando a la Red $+1$ y restando al Broadcast $-1$.
-    \item Sabemos que tipo es por una comparación sencilla, comparamos con la red y el broadcast, si ninguno entra entonces es un tipo host.
+    \item Se analiza cada trama  por separado
+    \item Procesamos el campo de control que se encuenta el en byte 17. 
+    \item  Checamos el tipo de trama que tendremos, para esto realizamos un \& con 3.
+    \begin{itemize}
+        \item  Si es un 0 o un 2 entonces es de Información. En este tipo de trama la cabecera de 2 bytes es de la siguiente marera con lo que realizando unicamente un corrimiento de $>>1$ podemos obtener N(s) del byte 17 o N(R) del byte 18. Y además obtenemos el P/F con un \&1.
+        \begin{figure}[h]
+              \centering
+             \includegraphics[width=0.45\textwidth]{TI2b}   
+        \end{figure}
+    
+        \item  Si es un 1 tenemos una trama de Supervisión. 
 
-    \item Por ultimo creamos una funcion que nos muestre por pantalla la IP con su formato.  
+        Con esta trama podemos obtener el valor del comando realizando un corrimiento $>>2$ y luego un \&3. 
+
+        Despues checando el P/F podemos determinar si es necesario char el SAPd para saber si es comando o respuesta Si P/F=1 chacamos el Sap (byte 16) y si es 0 es Comando y si es 1 es Respuesta.
+
+         El P/F  lo podemos obtener realizando un \& 1 en el byte 18. 
+
+         Y el Sap con un \& 1 con el byte 16.
+
+
+         Con esto tenemos la posicón del comando o respuesta a usar dependiento de la siguiente tabla.
+
+        \begin{figure}[h]
+              \centering
+             \includegraphics[width=0.45\textwidth]{TS2b}   
+        \end{figure}
+        \begin{tabular}{|c |c | c |c| }
+           % And this is the name of all the headers
+           \hline
+           SS&  Bits & Comando & Significado \\ [0.5ex] 
+           \hline
+          
+           %Body
+           0 &  00  &  RR    & Receptor Listo    \\
+           1 &  01  &  RNR   & Receptor no listo    \\
+           2 &  10  &  REJ   & Rechazo    \\
+           3 &  11  &  SREJ  & Rechazo selectivo     \\
+           \hline
+           
+         
+        \end{tabular}
+
+        \item  Si es un 3 tenemos una trama Sin numerar.
+
+        Como en la de supervisión checamos el P/F y el SAP y con corrimientos y and's:  $((byte 17>>2)\&3)|((byte 17 >>3)\&28)$ podemos obtener los números MM y con la siguiente tabla podemos obtener su significado.
+
+        \begin{figure}[h]
+              \centering
+             \includegraphics[width=0.45\textwidth]{TU}   
+        \end{figure}
+
+                \begin{tabular}{|c |c | c |c|c|}
+           % And this is the name of all the headers
+           \hline
+           M & Comando  & Respuesta & Significado C& Significado R\\ [0.5ex] 
+           \hline
+          
+           %Body
+           0 &  UI  &  UI    & Unnumered Information & Unnumered Information   \\
+           1 &SIM&  RIM   & Set Inicialization Mode& Request Inicialization Mode   \\
+           3 &SARM&  DM   & Modo Desconectado&    \\
+           4 &UP&    & Unnumered Pull   &\\
+           7 &SABM&    &   &\\
+           8 &DISC&RD& Disconect  & Request Disconect\\
+           11 &SARME&    &   &\\
+           12 && UA   &   &Unnumered Acknowledgment\\
+           15 &SABME&    &   &\\
+           16 &SNRM&    & Set Normal Response Mode  &\\
+           17 && FRMR   &   &\\
+           19 &RSET&    &    &\\
+            23 &XID&XID&Exchange Station Identification&Exchange Station Identification\\
+            27 &SNMRE&    &    &\\
+
+
+           
+           \hline
+           
+         
+        \end{tabular}
+
+
+    \end{itemize}
+   
 \end{itemize}
 
 \section{Resultados}
 Tenemos los siguientes resultados:
 
-%                    \begin{figure}[h]
- %                       \centering
-  %                      \includegraphics[width=0.6\textwidth]{A}
-   %                 \end{figure}
+                    \begin{figure}[h]
+                        \centering
+                        \includegraphics[width=0.6\textwidth]{PruebaLLC.png}
+                    \end{figure}
 
-%                    \begin{figure}[h]
- %                       \centering
-  %                      \includegraphics[width=0.6\textwidth]{B}
-   %                 \end{figure}
 
-    %                \begin{figure}[h]
-     %                   \centering
-      %                  \includegraphics[width=0.6\textwidth]{C}
-       %             \end{figure}
-
-%                    \begin{figure}[h]
- %                       \centering
-  %                      \includegraphics[width=0.6\textwidth]{D}
-   %                 \end{figure}
                     \clearpage
 
 
 \section{Conclusión}
 
-Aprender a realizar calculos bit a bit fue bastante interesante, normalmente nos dicen ese tipo de cosas pero al no aplicarlas no vemos el gran potencial que pueden tener.
+Realizar este tipo de programa evita tener que realizar operaciones que tienden a error humano, tales como olvidar un bit o colocar alguno demás, ademas de así mejorar el tiempo en que se realizaría.
 
-Por ejemplo usar un unsigned int para almacenar 32 bits de una IP me parece realmente interesante, o usar los corrimientos y los operadores binarios una manera sencilla, elegante y eficiente de realizar este tipo de calculos.
-
-Cuando lo implemente tuve varios errores, algunos más dificiles de corregir que otros, uno que me costo trabajo ver fue la jerarquía de los operadores binarios, me realizaba cosas extrañas.
-
-La función que se me hizo dificil fue mostrarlo, pues lo guarde como un entero completo, si embargo realizar los calculos fue muy sencillo, esta manera me gustó mas que realizar 4 variables para una IP.
-
-Uno de los errores de mi programa es cuando le mandas caracteres, no coloca nada dentro de mi IP entonces se queda con el 0.0.0.0 default.
-
-Una ultima mejora a realizar es la comparación para definir la clase puedo realizarla de mejor marea sin necesidad de realizar un corrimiento y ademas la operación.
-Veremos esta mejora en la siguiente versión de esta práctica. 
-
+Como se vió mecanizarlo es sencillo por su orientación a bits.
 
 
 
@@ -563,7 +655,7 @@ Veremos esta mejora en la siguiente versión de esta práctica.
 
 
 
-\lstinputlisting[language=C,basicstyle=\tiny]{IP.c}
+\lstinputlisting[language=C,basicstyle=\tiny]{TramaLLC.c}
 
 \section{Mapa de memoria}
  %                   \begin{figure}[h]
@@ -584,11 +676,6 @@ Veremos esta mejora en la siguiente versión de esta práctica.
 % ========        BIBLIO      ===================
 % ===============================================
 \begin{thebibliography}{10}
-
-    \bibitem{Axel} 
-        Axel Ernesto Moreno Cervantes
-        \textit{Redes de Computación}. 
-        ESCOM, 2018.
     \bibitem{Nidia}
         Nidia Cortez.
         \textit{Redes de Computadoras}
