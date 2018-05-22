@@ -427,7 +427,7 @@
     % ============ NAME OF THE BOOK  ===============
     \href{\ProjectNameLink/LibroRedes}                       %Link to Author
     {\fontsize{36}{50}                                              %Size of the book
-        \selectfont \textbf{Práctica 1}}\\[0.5cm]       %Name of the book
+        \selectfont \textbf{Práctica 4}}\\[0.5cm]       %Name of the book
     {\fontsize{36}{50}                                              %Size of the book
         \selectfont \textbf{Analizador de Trama LLC}}\\[0.5cm]                %Name of the book
     \textcolor{ColorSubtext}                                        %Color or the topic
@@ -447,7 +447,7 @@
     \vspace                                                         %Give some space
     \baselineskip                                                   %But we need this to up command
     
-    {\large \textsf{Marzo 2018}}                                  %Date
+    {\large \textsf{Abril 2018}}                                  %Date
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%   ABSTRACT    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -526,6 +526,8 @@ Tenemos la siguiente cabecera:
     \centering
     \includegraphics[width=0.45\textwidth]{LLC}   
 \end{figure}
+
+Con esta podemos analizar tramas de este tipo.
 \section{Problema}
 Realizar este tipo de análisis en muy especifico y fácil de realizar, sin embargo tiende a los errores humanos. 
 
@@ -599,24 +601,24 @@ Una cabecera LLC puede ser leída de manera secuencial, por lo tanto es posible 
                 \begin{tabular}{|c |c | c |c|c|}
            % And this is the name of all the headers
            \hline
-           M & Comando  & Respuesta & Significado C& Significado R\\ [0.5ex] 
+           M&Comando&Respuesta&Sig.Com& Sig.Res\\ [0.5ex] 
            \hline
           
            %Body
-           0 &  UI  &  UI    & Unnumered Information & Unnumered Information   \\
-           1 &SIM&  RIM   & Set Inicialization Mode& Request Inicialization Mode   \\
-           3 &SARM&  DM   & Modo Desconectado&    \\
-           4 &UP&    & Unnumered Pull   &\\
-           7 &SABM&    &   &\\
-           8 &DISC&RD& Disconect  & Request Disconect\\
-           11 &SARME&    &   &\\
-           12 && UA   &   &Unnumered Acknowledgment\\
-           15 &SABME&    &   &\\
-           16 &SNRM&    & Set Normal Response Mode  &\\
-           17 && FRMR   &   &\\
-           19 &RSET&    &    &\\
-            23 &XID&XID&Exchange Station Identification&Exchange Station Identification\\
-            27 &SNMRE&    &    &\\
+           0 &UI&UI&Unnumered Information&Unnumered Information\\
+           1 &SIM&RIM&Set Inicialization Mode& Request Inicialization Mode   \\
+           3 &SARM&DM&Modo Desconectado&\\
+           4 &UP&&Unnumered Pull&\\
+           7 &SABM&&&\\
+           8 &DISC&RD& Disconect&Request Disconect\\
+           11 &SARME&&&\\
+           12 &&UA&&Unnum. Acknow.\\
+           15 &SABME&&&\\
+           16 &SNRM&&SetNormalResponseMode&\\
+           17 &&FRMR&&\\
+           19 &RSET&&&\\
+           23 &XID&XID&Ex.Station Identif.&Ex. Station Identif.\\
+           27 &SNMRE&&&\\
 
 
            
@@ -627,6 +629,8 @@ Una cabecera LLC puede ser leída de manera secuencial, por lo tanto es posible 
 
 
     \end{itemize}
+
+    \item Mostrar la información obtenida de cada trama.
    
 \end{itemize}
 
@@ -635,7 +639,7 @@ Tenemos los siguientes resultados:
 
                     \begin{figure}[h]
                         \centering
-                        \includegraphics[width=0.6\textwidth]{PruebaLLC.png}
+                        \includegraphics[width=1\textwidth]{PruebaLLC.png}
                     \end{figure}
 
 
@@ -646,10 +650,7 @@ Tenemos los siguientes resultados:
 
 Realizar este tipo de programa evita tener que realizar operaciones que tienden a error humano, tales como olvidar un bit o colocar alguno demás, ademas de así mejorar el tiempo en que se realizaría.
 
-Como se vió mecanizarlo es sencillo por su orientación a bits.
-
-
-
+Como se vió mecanizarlo es sencillo por su orientación a bits con ello podemos analizar muchas tramas de manera rápida.
 
 \section{Código}
 
@@ -657,7 +658,7 @@ Como se vió mecanizarlo es sencillo por su orientación a bits.
 
 \lstinputlisting[language=C,basicstyle=\tiny]{TramaLLC.c}
 
-\section{Mapa de memoria}
+%\section{Mapa de memoria}
  %                   \begin{figure}[h]
   %                      \centering
    %                     \includegraphics[width=0.6\textwidth]{Mapa1}
